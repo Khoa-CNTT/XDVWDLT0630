@@ -1,0 +1,263 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table users {
+  id String [pk]
+  email String [unique, not null]
+  password String [not null]
+  phone String
+  address String
+  avatar String
+  name String [not null]
+  date_of_birth String
+  country String
+  createAt DateTime [default: `now()`, not null]
+  updateAt DateTime
+  confirmPassword String
+  roleId String
+  verificationCode String
+  verificationCodeExpiresAt DateTime
+  isVerified Boolean [not null, default: false]
+  role roles
+  Vaccination users_on_vaccinations [not null]
+  Booking bookings [not null]
+  Payment payments [not null]
+  Blog blogs [not null]
+  Notification notifications [not null]
+  VaccinationRecord vaccination_records [not null]
+  Appointment appointments [not null]
+}
+
+Table roles {
+  id String [pk]
+  name String [unique, not null]
+  users users [not null]
+}
+
+Table tags {
+  id String [pk]
+  name String [unique, not null]
+  blogs blogs [not null]
+}
+
+Table blogs {
+  id String [pk]
+  title String [not null]
+  content String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime
+  userId String
+  tagId String [not null]
+  user users
+  tag tags [not null]
+}
+
+Table vaccinations {
+  id String [pk]
+  userId String
+  vaccineName String [not null]
+  image String
+  location String
+  description String
+  price Float
+  batchNumber String
+  certificate String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime
+  remainingQuantity Int
+  expirationDate DateTime
+  manufacturerId String
+  supplierId String
+  sideEffect String
+  manufacturer manufacturers
+  supplier suppliers
+  user users_on_vaccinations [not null]
+  Booking bookings [not null]
+  Inventory inventory [not null]
+  VaccinationRecord vaccination_records [not null]
+  Appointment appointments [not null]
+}
+
+Table manufacturers {
+  id String [pk]
+  name String [unique, not null]
+  country String
+  contactInfo String
+  vaccinations vaccinations [not null]
+}
+
+Table suppliers {
+  id String [pk]
+  name String [unique, not null]
+  address String
+  contactInfo String
+  Vaccination vaccinations [not null]
+}
+
+Table vaccination_records {
+  id String [pk]
+  userId String [not null]
+  vaccinationId String [not null]
+  doseNumber Int [not null]
+  vaccinationDate DateTime [not null]
+  location String
+  provider String
+  certificate String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime
+  user users [not null]
+  vaccination vaccinations [not null]
+}
+
+Table appointments {
+  id String [pk]
+  userId String [not null]
+  vaccinationId String [not null]
+  appointmentDate DateTime [not null]
+  status AppointmentStatus [not null, default: 'PENDING']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime
+  user users [not null]
+  vaccination vaccinations [not null]
+}
+
+Table notifications {
+  id String [pk]
+  userId String [not null]
+  message String [not null]
+  type NotificationType [not null]
+  sentAt DateTime [default: `now()`, not null]
+  isRead Boolean [not null, default: false]
+  user users [not null]
+}
+
+Table inventory {
+  id String [pk]
+  vaccinationId String [unique, not null]
+  nameVaccine String
+  quantity Int [not null, default: 0]
+  lastUpdated DateTime [default: `now()`, not null]
+  Vaccination vaccinations [not null]
+}
+
+Table bookings {
+  id String [pk]
+  vaccinationId String
+  userId String [not null]
+  vaccinationQuantity Int
+  vaccinationPrice Float
+  totalAmount Float
+  createdAt DateTime [default: `now()`, not null]
+  status BookingStatus [not null, default: 'PENDING']
+  vaccinationDate DateTime
+  confirmationTime DateTime
+  appointmentDate DateTime
+  Payment payments [not null]
+  Vaccination vaccinations
+  user users [not null]
+}
+
+Table payments {
+  id String [pk]
+  bookingId String
+  userId String [not null]
+  amount Float [not null]
+  paymentMethod PaymentMethod [not null]
+  status PaymentStatus [not null]
+  appointmentDate DateTime
+  orderId String [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime
+  booking bookings
+  user users [not null]
+}
+
+Table users_on_vaccinations {
+  userId String [not null]
+  user users [not null]
+  vaccinationId String [not null]
+  vaccination vaccinations [not null]
+
+  indexes {
+    (userId, vaccinationId) [pk]
+  }
+}
+
+Enum TagType {
+  SUC_KHOE
+  KHOA_HOC
+  Y_TE
+  CONG_NGHE
+  GIAO_DUC
+}
+
+Enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
+}
+
+Enum NotificationType {
+  REMINDER
+  CONFIRMATION
+  PAYMENT
+  UPDATE
+}
+
+Enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  SUCCESS
+  WAITING_PAYMENT
+}
+
+Enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+Enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+Ref: users.roleId > roles.id
+
+Ref: blogs.userId > users.id
+
+Ref: blogs.tagId > tags.id
+
+Ref: vaccinations.manufacturerId > manufacturers.id
+
+Ref: vaccinations.supplierId > suppliers.id
+
+Ref: vaccination_records.userId > users.id
+
+Ref: vaccination_records.vaccinationId > vaccinations.id
+
+Ref: appointments.userId > users.id
+
+Ref: appointments.vaccinationId > vaccinations.id
+
+Ref: notifications.userId > users.id
+
+Ref: inventory.vaccinationId > vaccinations.id
+
+Ref: bookings.vaccinationId > vaccinations.id
+
+Ref: bookings.userId > users.id
+
+Ref: payments.bookingId > bookings.id [delete: Set Null]
+
+Ref: payments.userId > users.id
+
+Ref: users_on_vaccinations.userId > users.id
+
+Ref: users_on_vaccinations.vaccinationId > vaccinations.id

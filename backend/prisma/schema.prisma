@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                        String              @id @default(uuid())
+  email                     String              @unique
+  password                  String
+  phone                     String?
+  address                   String?
+  avatar                    String?
+  name                      String
+  date_of_birth             String?
+  country                   String?
+  createAt                  DateTime            @default(now())
+  updateAt                  DateTime?           @updatedAt
+  confirmPassword           String?
+  roleId                    String?
+  verificationCode          String?
+  verificationCodeExpiresAt DateTime?
+  isVerified                Boolean             @default(false)
+  role                      Role?               @relation(fields: [roleId], references: [id])
+  Vaccination               UserOnVaccination[]
+  Booking                   Booking[]
+  Payment                   Payment[]
+  Blog                      Blog[]
+  Notification              Notification[]
+  VaccinationRecord         VaccinationRecord[]
+  Appointment               Appointment[]
+
+  @@map("users")
+}
+
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  blogs Blog[]
+
+  @@map("tags")
+}
+
+model Blog {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  userId    String?
+  tagId     String
+  user      User?     @relation(fields: [userId], references: [id])
+  tag       Tag       @relation(fields: [tagId], references: [id])
+
+  @@map("blogs")
+}
+
+enum TagType {
+  SUC_KHOE
+  KHOA_HOC
+  Y_TE
+  CONG_NGHE
+  GIAO_DUC
+}
+
+model Vaccination {
+  id                String        @id @default(uuid())
+  userId            String?
+  vaccineName       String
+  image             String?
+  location          String?
+  description       String?
+  price             Float?
+  batchNumber       String?
+  certificate       String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime?     @updatedAt
+  remainingQuantity Int?
+  expirationDate    DateTime?
+  manufacturerId    String?
+  supplierId        String?
+  sideEffect        String?
+  manufacturer      Manufacturer? @relation(fields: [manufacturerId], references: [id])
+  supplier          Supplier?     @relation(fields: [supplierId], references: [id])
+
+  user              UserOnVaccination[]
+  Booking           Booking[]
+  Inventory         Inventory[]
+  VaccinationRecord VaccinationRecord[]
+  Appointment       Appointment[]
+
+  @@map("vaccinations")
+}
+
+model Manufacturer {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  country     String?
+  contactInfo String?
+
+  vaccinations Vaccination[]
+
+  @@map("manufacturers")
+}
+
+model Supplier {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  address     String?
+  contactInfo String?
+
+  Vaccination Vaccination[]
+
+  @@map("suppliers")
+}
+
+// Lịch sử tiêm chủng
+model VaccinationRecord {
+  id              String    @id @default(uuid())
+  userId          String
+  vaccinationId   String
+  doseNumber      Int
+  vaccinationDate DateTime
+  location        String?
+  provider        String?
+  certificate     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime? @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("vaccination_records")
+}
+
+// Lịch hẹn
+model Appointment {
+  id              String            @id @default(uuid())
+  userId          String
+  vaccinationId   String
+  appointmentDate DateTime
+  status          AppointmentStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime?         @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id])
+  vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
+}
+
+model Notification {
+  id      String           @id @default(uuid())
+  userId  String
+  message String
+  type    NotificationType
+  sentAt  DateTime         @default(now())
+  isRead  Boolean          @default(false)
+  user    User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  REMINDER
+  CONFIRMATION
+  PAYMENT
+  UPDATE
+}
+
+// Kho
+model Inventory {
+  id            String      @id @default(uuid())
+  vaccinationId String      @unique
+  nameVaccine   String?
+  quantity      Int         @default(0)
+  lastUpdated   DateTime    @default(now())
+  Vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@map("inventory")
+}
+
+model Booking {
+  id                  String        @id @default(uuid())
+  vaccinationId       String?
+  userId              String
+  vaccinationQuantity Int?
+  vaccinationPrice    Float?
+  totalAmount         Float?
+  createdAt           DateTime      @default(now())
+  status              BookingStatus @default(PENDING)
+  vaccinationDate     DateTime?
+  confirmationTime    DateTime?
+  appointmentDate     DateTime?
+  Payment             Payment[]
+  Vaccination         Vaccination?  @relation(fields: [vaccinationId], references: [id])
+  user                User          @relation(fields: [userId], references: [id])
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  SUCCESS
+  WAITING_PAYMENT
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String?
+  userId          String
+  amount          Float
+  paymentMethod   PaymentMethod
+  status          PaymentStatus
+  appointmentDate DateTime?
+  orderId         String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model UserOnVaccination {
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  vaccinationId String
+  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+
+  @@id([userId, vaccinationId])
+  @@map("users_on_vaccinations")
+}
