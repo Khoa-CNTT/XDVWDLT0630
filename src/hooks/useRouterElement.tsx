@@ -6,19 +6,19 @@ import PageNotFound from '@/pages/404/PageNotFound'
 import General from '@/pages/dashboard/General' // Import General thay vì Dashboard
 import HomePage from '@/pages/home/HomePage'
 import Login from '@/pages/login/Login'
-import Register from '@/pages/register/Register'
-import BlogDetails from '@/pages/blog/BlogDetails'
-import Profile from '@/pages/profile/Profile'
-import VaccinePrices from '@/pages/pricelist/PricelistDetails'
-import ServiceIntro from '@/pages/introduce/ServiceIntroduce'
-import ResetPassword from '@/pages/reset-password/Reset-Password'
+// import Register from '@/pages/register/Register'
+// import BlogDetails from '@/pages/blog/BlogDetails'
+// import Profile from '@/pages/profile/Profile'
+// import VaccinePrices from '@/pages/pricelist/PricelistDetails'
+// import ServiceIntro from '@/pages/introduce/ServiceIntroduce'
+// import ResetPassword from '@/pages/reset-password/Reset-Password'
 import ForgotPassword from '@/pages/forgot-password/Forgot-Password'
 
-import { OTPInput } from '@/pages/otp/otp'
-import ListVaccination from '@/pages/vaccination/list-vaccination'
+// import { OTPInput } from '@/pages/otp/otp'
+// import ListVaccination from '@/pages/vaccination/list-vaccination'
 import CheckOutPagePageMain from '@/pages/booking/Booking'
 import BlogLayout from '@/pages/blog/BlogLayout'
-import VaccineDetail from '@/pages/vaccineDetail/Vaccine-Detail'
+// import VaccineDetail from '@/pages/vaccineDetail/Vaccine-Detail'
 import { BlogPage } from '@/pages/dashboard/blogs/Page'
 import UsersPage from '@/pages/dashboard/users/Page'
 import VaccinesPage from '@/pages/dashboard/vaccines/Page'
@@ -35,10 +35,10 @@ export default function useRoutesElements() {
     [
       { path: path.home, element: <HomePage /> },
       { path: path.login, element: <Login /> },
-      { path: path.register, element: <Register /> },
-      { path: path.resetPassword, element: <ResetPassword /> },
+      // { path: path.register, element: <Register /> },
+      // { path: path.resetPassword, element: <ResetPassword /> },
       { path: path.forgotPassword, element: <ForgotPassword /> },
-      { path: path.otp, element: <OTPInput /> },
+      // { path: path.otp, element: <OTPInput /> },
 
       {
         path: path.admin.dashboard, // Giả định là "/admin/dashboard"
@@ -120,57 +120,57 @@ export default function useRoutesElements() {
           </LayoutMain>
         )
       },
-      {
-        path: path.blog,
-        element: (
-          <LayoutClient>
-            <BlogLayout />
-          </LayoutClient>
-        ),
-        children: [
-          {
-            path: ':id',
-            element: <BlogDetails />
-          },
-          {
-            path: '',
-            element: <BlogDetails />
-          }
-        ]
-      },
+      // {
+      //   path: path.blog,
+      //   element: (
+      //     <LayoutClient>
+      //       <BlogLayout />
+      //     </LayoutClient>
+      //   ),
+      //   children: [
+      //     {
+      //       path: ':id',
+      //       element: <BlogDetails />
+      //     },
+      //     {
+      //       path: '',
+      //       element: <BlogDetails />
+      //     }
+      //   ]
+      // },
 
-      {
-        path: path.profile,
-        element: (
-          <LayoutClient>
-            <Profile />
-          </LayoutClient>
-        )
-      },
-      {
-        path: path.pricelist,
-        element: (
-          <LayoutClient>
-            <VaccinePrices />
-          </LayoutClient>
-        )
-      },
-      {
-        path: path.list,
-        element: (
-          <LayoutClient>
-            <ListVaccination />
-          </LayoutClient>
-        )
-      },
-      {
-        path: path.detail,
-        element: (
-          <LayoutClient>
-            <VaccineDetail />
-          </LayoutClient>
-        )
-      },
+      // {
+      //   path: path.profile,
+      //   element: (
+      //     <LayoutClient>
+      //       <Profile />
+      //     </LayoutClient>
+      //   )
+      // },
+      // {
+      //   path: path.pricelist,
+      //   element: (
+      //     <LayoutClient>
+      //       <VaccinePrices />
+      //     </LayoutClient>
+      //   )
+      // },
+      // {
+      //   path: path.list,
+      //   element: (
+      //     <LayoutClient>
+      //       <ListVaccination />
+      //     </LayoutClient>
+      //   )
+      // },
+      // {
+      //   path: path.detail,
+      //   element: (
+      //     <LayoutClient>
+      //       <VaccineDetail />
+      //     </LayoutClient>
+      //   )
+      // },
 
       {
         path: path.booking,
@@ -181,10 +181,10 @@ export default function useRoutesElements() {
         )
       },
 
-      {
-        path: path.introduce,
-        element: <ServiceIntro />
-      },
+      // {
+      //   path: path.introduce,
+      //   element: <ServiceIntro />
+      // },
       { path: '*', element: <PageNotFound /> }
     ],
     location

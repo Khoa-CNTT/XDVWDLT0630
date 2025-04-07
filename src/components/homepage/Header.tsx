@@ -32,10 +32,10 @@ export default function Header() {
   const user = getMeQuery.data
   if (user) {
     setUserToLS({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role.name
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      role: user?.role?.name
     })
   }
 
@@ -211,7 +211,7 @@ export default function Header() {
                       Log in
                     </Button>
                   </Link>
-                  <Link to={path.register} className='w-full'>
+                  <Link to={ path.register} className='w-full'>
                     <Button className='w-full mt-2 bg-gradient-to-r from-blue-400 to-blue-800 hover:from-blue-600 hover:to-blue-600 text-white'>
                       Sign up
                     </Button>
