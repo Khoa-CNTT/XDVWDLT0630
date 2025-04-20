@@ -10,6 +10,7 @@ import { Icons } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { ThemeToggle } from '@/components/theme/theme-toogle'
 import Chatbox from '@/pages/chatbox/Chatbox'
+import Messenger from '@/pages/chatbox/Messenger/Messenger'
 import { useGetMeQuery, useUpdateMeQuery } from '@/queries/useUser'
 import { setUserToLS } from '@/core/shared/storage'
 
@@ -233,7 +234,10 @@ export default function Header() {
         </Button>
       )}
 
-      <Chatbox />
+<div className='fixed bottom-4 right-4 flex flex-col items-end gap-3 z-50'>
+        <Messenger />
+        <Chatbox />
+      </div>
     </div>
   )
 }
