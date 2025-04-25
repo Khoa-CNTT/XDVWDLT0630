@@ -29,9 +29,13 @@ import OrdersPage from '@/pages/dashboard/orders/Page'
 import AppointmentsPage from '@/pages/dashboard/appointments/Page'
 import HistorysPage1 from '@/pages/dashboard/historys/Page'
 import Contact from '@/pages/contact/ContactUS'
+import ServiceDetail from '@/pages/serviceDetail/Service'
+import PrivacyPolicy from '@/pages/page-footer/links/PrivacyPolicy'
+import SearchResults from '@/pages/searchresults/SearchResults'
+
 export default function useRoutesElements() {
   const location = useLocation()
-
+const searchPath = path.search ?? '/search'
   const routeElements = useRoutes(
     [
       { path: path.home, element: <HomePage /> },
@@ -41,6 +45,17 @@ export default function useRoutesElements() {
       { path: path.forgotPassword, element: <ForgotPassword /> },
       { path: path.otp, element: <OTPInput /> },
       { path: path.contact, element: <Contact /> },
+      { path: path.serviceDetail, element: <ServiceDetail /> },
+      { path: path.policy, element: <PrivacyPolicy /> },
+      
+      {
+        path: searchPath, // Sử dụng giá trị đã tính toán
+        element: (
+          <LayoutClient>
+            <SearchResults />
+          </LayoutClient>
+        )
+      },
       {
         path: path.admin.dashboard, // Giả định là "/admin/dashboard"
         element: (

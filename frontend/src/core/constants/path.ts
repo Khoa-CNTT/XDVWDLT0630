@@ -14,6 +14,9 @@ export const path = {
   otp: '/verify-email',
   booking: '/booking',
   contact: '/contact',
+  serviceDetail: '/services',
+  policy: '/policy',
+  searchresult: '/searchresult',
   admin: {
     dashboard: '/admin/dashboard',
     vaccines: '/admin/vaccines',
