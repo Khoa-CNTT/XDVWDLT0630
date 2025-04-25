@@ -1,86 +1,53 @@
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { Star } from 'lucide-react'
+import { Baby, User, CalendarCheck, Star } from 'lucide-react'
 
-export const testimonials = [
+export const vaccinationServices = [
   {
-    id: 't01',
-    name: 'Sarah J.',
-    imageUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-    comment:
-      "Absolutely seamless experience! Booking was quick, and the car was in perfect condition. I'll definitely use this service again.",
-    rating: 5
+    icon: Baby,
+    name: 'Child Vaccination',
+    description: 'Safe and effective immunization programs for children of all ages.'
   },
   {
-    id: 't02',
-    name: 'Mark T.',
-    imageUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-    comment:
-      'Great selection of vehicles and very affordable rates. The customer service team was incredibly helpful when .',
-    rating: 5
+    icon: User,
+    name: 'Adult Vaccination',
+    description: 'Comprehensive vaccination services tailored for adults.'
   },
   {
-    id: 't03',
-    name: 'James L.',
-    imageUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-    comment:
-      'The navigation tools were a lifesaver! They made it so easy to explore the city without getting lost. Highly recommended!',
-    rating: 5
+    icon: CalendarCheck,
+    name: 'On-Demand Vaccination',
+    description: 'Flexible vaccination options based on your specific needs.'
   },
   {
-    id: 't04',
-    name: 'Alex P.',
-    imageUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-    comment:
-      'Fantastic service! The car was clean, well-maintained, and the pickup process was a breeze. I’ll be using this service for all my future trips.',
-    rating: 5
-  },
-  {
-    id: 't05',
-    name: 'David S.',
-    imageUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
-    comment:
-      'Great value for money! The booking process was quick, and the customer support was responsive. Overall, a very positive experience.',
-    rating: 5
+    icon: Star,
+    name: 'VIP Vaccination',
+    description: 'Premium vaccination services with exclusive care and priority.'
   }
 ]
 
-export default function Testimonials() {
+export default function VaccinationServices() {
   return (
-    <div className='mx-auto max-w-none px-5 sm:max-w-[90%] sm:px-0 2xl:max-w-8xl'>
-      <h2 className='text-balance text-3xl font-bold xl:text-center'>What Our Customers Are Saying</h2>
-      <div className='pt-6 lg:pt-8'>
-        <div className='relative'>
-          <Carousel>
-            <CarouselContent className='m-0 space-x-4 lg:space-x-6'>
-              {testimonials.map(({ id, name, comment, imageUrl, rating }) => {
-                return (
-                  <CarouselItem key={id} className='p-0 sm:basis-1/2 md:basis-1/3 xl:basis-1/4 h-full'>
-                    <figure className='flex flex-col justify-between rounded-2xl bg-neutral-50 p-8 min-h-[250px]'>
-                      <div>
-                        <div className='flex items-center' aria-label={`Rating: ${rating} out of 5`}>
-                          {[...Array(rating)].map((_, index) => (
-                            <Star key={index} className='size-[15px] text-yellow-500' />
-                          ))}
-                        </div>
-                        <div className='pt-4 flex-grow'>
-                          <blockquote className='text-balance text-[14px] leading-[23px] text-neutral-600 sm:text-[15px] sm:leading-normal md:leading-[26px] lg:text-[16px]'>
-                            “{comment}”
-                          </blockquote>
-                        </div>
-                      </div>
-                      <div className='pt-8'>
-                        <figcaption className='flex items-center gap-2.5'>
-                          <img src={imageUrl} alt={name} className='size-6 shrink-0 rounded-full object-cover' />
-                          <p className='text-[13px] font-medium text-neutral-700 xl:text-[14px]'>{name}</p>
-                        </figcaption>
-                      </div>
-                    </figure>
-                  </CarouselItem>
-                )
-              })}
-            </CarouselContent>
-          </Carousel>
-        </div>
+    <div className='container mx-auto py-16 bg-gray-50 dark:bg-gray-900'>
+      <div className='text-center'>
+        <h2 className='text-3xl font-bold text-gray-900 dark:text-white'>Explore Our Vaccination Services</h2>
+        <p className='text-gray-500 dark:text-gray-400'>
+          Discover a range of immunization options tailored to your needs.
+        </p>
+      </div>
+      <div className='mt-12 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4'>
+        {vaccinationServices.map(({ icon: Icon, name, description }) => (
+          <div
+            key={name}
+            className='bg-white rounded-xl shadow-xl p-6 text-center border border-gray-200 dark:bg-gray-800 dark:border-gray-700 transition duration-300 hover:shadow-xl hover:-translate-y-2 transform'
+          >
+            <div className='flex justify-center mb-4'>
+              <Icon
+                className='w-16 h-16 text-blue-500 dark:text-blue-400 transition duration-300 hover:scale-105'
+                strokeWidth={1.5}
+              />
+            </div>
+            <h3 className='mt-4 text-xl font-bold text-gray-900 dark:text-white'>{name}</h3>
+            <p className='text-base text-gray-600 dark:text-gray-300'>{description}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
