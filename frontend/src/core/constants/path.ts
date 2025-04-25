@@ -13,7 +13,7 @@ export const path = {
   forgotPassword: '/forgot-password',
   otp: '/verify-email',
   booking: '/booking',
-
+  contact: '/contact',
   admin: {
     dashboard: '/admin/dashboard',
     vaccines: '/admin/vaccines',

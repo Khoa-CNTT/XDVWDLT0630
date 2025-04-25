@@ -28,6 +28,7 @@ import ManufacturersPage from '@/pages/dashboard/manufacturers/Page'
 import OrdersPage from '@/pages/dashboard/orders/Page'
 import AppointmentsPage from '@/pages/dashboard/appointments/Page'
 import HistorysPage1 from '@/pages/dashboard/historys/Page'
+import Contact from '@/pages/contact/ContactUS'
 export default function useRoutesElements() {
   const location = useLocation()
 
@@ -39,7 +40,7 @@ export default function useRoutesElements() {
       { path: path.resetPassword, element: <ResetPassword /> },
       { path: path.forgotPassword, element: <ForgotPassword /> },
       { path: path.otp, element: <OTPInput /> },
-
+      { path: path.contact, element: <Contact /> },
       {
         path: path.admin.dashboard, // Giả định là "/admin/dashboard"
         element: (
