@@ -3,7 +3,7 @@
 ## 📌 Giới thiệu
 VaxBot là một nền tảng giúp người dùng dễ dàng đặt lịch tiêm chủng, nhận nhắc nhở tự động về lịch tiêm, và tư vấn sức khỏe qua chatbot AI. Hệ thống cung cấp giao diện thân thiện, dễ sử dụng và hỗ trợ quản lý lịch tiêm một cách hiệu quả.
 
-## ✨ Tính năng chính
+## ✨ Tính năng chính 
 - ✅ **Đặt lịch tiêm chủng**: Người dùng có thể đặt lịch tiêm nhanh chóng qua giao diện web.
 - 🔔 **Nhắc nhở tự động**: Hệ thống tự động gửi thông báo nhắc nhở trước ngày tiêm.
 - 🤖 **Chatbot AI tư vấn**: Cung cấp thông tin về vắc xin, lịch tiêm và tư vấn sức khỏe liên quan.
