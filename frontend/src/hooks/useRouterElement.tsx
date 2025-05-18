@@ -46,13 +46,19 @@ const searchPath = path.search ?? '/search'
       { path: path.otp, element: <OTPInput /> },
       { path: path.contact, element: <Contact /> },
       { path: path.serviceDetail, element: <ServiceDetail /> },
-      { path: path.policy, element: <PrivacyPolicy /> },
-      
       {
         path: searchPath, // Sử dụng giá trị đã tính toán
         element: (
           <LayoutClient>
             <SearchResults />
+          </LayoutClient>
+        )
+      },
+      {
+        path: path.policy, // Sử dụng giá trị đã tính toán
+        element: (
+          <LayoutClient>
+            <PrivacyPolicy />
           </LayoutClient>
         )
       },

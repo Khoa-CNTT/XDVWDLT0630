@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Header from '@/components/homepage/Header'
-import Footer from '@/components/homepage/Footer'
+
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 const PrivacyPolicy: React.FC = () => {
@@ -29,7 +28,7 @@ const PrivacyPolicy: React.FC = () => {
 
   return (
     <div className='min-h-screen bg-white font-sans'>
-      <Header />
+
 
       {/* Hero Section */}
       <header className='relative mx-auto mt-[7rem] max-w-5xl rounded-3xl bg-gradient-to-r from-blue-300 via-teal-400 to-green-400 py-16 text-white'>
@@ -220,7 +219,7 @@ const PrivacyPolicy: React.FC = () => {
         </div>
       </section>
 
-      <Footer />
+ 
     </div>
   )
 }

@@ -17,6 +17,7 @@ export const path = {
   serviceDetail: '/services',
   policy: '/policy',
   searchresult: '/searchresult',
+  
   admin: {
     dashboard: '/admin/dashboard',
     vaccines: '/admin/vaccines',
