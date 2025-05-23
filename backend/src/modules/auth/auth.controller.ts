@@ -11,6 +11,7 @@ import {
   ResetPasswordDto,
 } from 'src/modules/auth/dto/auth.dto';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
+import { LogoutDto } from 'src/modules/auth/dto/logout.dto';
 import { RefreshTokenDto } from 'src/modules/auth/dto/refresh-token.dto';
 import { RegisterDto } from 'src/modules/auth/dto/register.dto';
 import { VerifyEmailDto } from 'src/modules/auth/dto/verify-code';
@@ -41,6 +42,13 @@ export class AuthController {
   @ApiCommonResponses('Đăng nhập')
   login(@Body() body: LoginDto): Promise<User> {
     return this.authService.login(body);
+  }
+
+  @Post('logout')
+  @UseGuards(HandleAuthGuard)
+  @ApiCommonResponses('Đăng xuất')
+  async logout(@Body() body: LogoutDto) {
+    return this.authService.logout(body.refresh_token);
   }
 
   @Post('refresh-token')
@@ -88,5 +96,11 @@ export class AuthController {
   @ApiCommonResponses('Tạo tài khoản user')
   async createUser(@Body() data: RegisterDto) {
     return this.authService.createUserByAdmin(data);
+  }
+
+  @Post('resend-verification-email')
+  @ApiCommonResponses('Gửi lại email xác thực')
+  async resendVerificationEmail(@Body() body: { email: string }) {
+    return this.authService.resendVerificationEmail(body.email);
   }
 }

@@ -50,7 +50,7 @@ export class UserController {
     return this.userService.getCountUser();
   }
 
-  @UseGuards(HandleAuthGuard)
+  //@UseGuards(HandleAuthGuard)
   @Get()
   @ApiCommonResponses('Lấy ra danh sách user')
   @CommonPagination()
@@ -123,5 +123,12 @@ export class UserController {
     @CurrentUserId() currentUserId: string,
   ): Promise<{ message: string }> {
     return this.userService.deleteUser(id, currentUserId);
+  }
+
+  @UseGuards(HandleAuthGuard)
+  @Get('list-user-by-role')
+  @ApiCommonResponses('Lấy ra danh sách user theo role USER')
+  getListUserByRole(): Promise<User[]> {
+    return this.userService.getListUserByRole();
   }
 }

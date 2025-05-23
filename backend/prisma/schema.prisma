@@ -79,32 +79,44 @@ enum TagType {
 }
 
 model Vaccination {
-  id                String        @id @default(uuid())
-  userId            String?
-  vaccineName       String
-  image             String?
-  location          String?
-  description       String?
-  price             Float?
-  batchNumber       String?
-  certificate       String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime?     @updatedAt
-  remainingQuantity Int?
-  expirationDate    DateTime?
-  manufacturerId    String?
-  supplierId        String?
-  sideEffect        String?
-  manufacturer      Manufacturer? @relation(fields: [manufacturerId], references: [id])
-  supplier          Supplier?     @relation(fields: [supplierId], references: [id])
+  id                    String        @id @default(uuid())
+  userId                String?
+  vaccineName           String        @unique
+  image                 String?
+  location              String?
+  description           String?
+  price                 Float?
+  batchNumber           String?
+  certificate           String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime?     @updatedAt
+  remainingQuantity     Int?
+  expirationDate        DateTime?
+  manufacturerId        String?
+  supplierId            String?
+  sideEffect            String?
+  categoryVaccinationId String?
+  manufacturer          Manufacturer? @relation(fields: [manufacturerId], references: [id])
+  supplier              Supplier?     @relation(fields: [supplierId], references: [id])
 
-  user              UserOnVaccination[]
-  Booking           Booking[]
-  Inventory         Inventory[]
-  VaccinationRecord VaccinationRecord[]
-  Appointment       Appointment[]
+  user                UserOnVaccination[]
+  Booking             Booking[]
+  Inventory           Inventory[]
+  VaccinationRecord   VaccinationRecord[]
+  Appointment         Appointment[]
+  CategoryVaccination CategoryVaccination? @relation(fields: [categoryVaccinationId], references: [id])
 
   @@map("vaccinations")
+}
+
+model CategoryVaccination {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  vaccines Vaccination[]
+
+  @@map("category_vaccinations")
 }
 
 model Manufacturer {
@@ -142,7 +154,7 @@ model VaccinationRecord {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime? @updatedAt
 
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
 
   @@map("vaccination_records")
@@ -158,7 +170,7 @@ model Appointment {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime?         @updatedAt
 
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
 
   @@map("appointments")
@@ -178,7 +190,7 @@ model Notification {
   type    NotificationType
   sentAt  DateTime         @default(now())
   isRead  Boolean          @default(false)
-  user    User             @relation(fields: [userId], references: [id])
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
@@ -216,7 +228,7 @@ model Booking {
   appointmentDate     DateTime?
   Payment             Payment[]
   Vaccination         Vaccination?  @relation(fields: [vaccinationId], references: [id])
-  user                User          @relation(fields: [userId], references: [id])
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("bookings")
 }
@@ -242,9 +254,18 @@ model Payment {
   updatedAt       DateTime?     @updatedAt
 
   booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
-  user    User     @relation(fields: [userId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("blacklisted_tokens")
 }
 
 enum PaymentMethod {
@@ -265,7 +286,7 @@ model UserOnVaccination {
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   vaccinationId String
-  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id])
+  vaccination   Vaccination @relation(fields: [vaccinationId], references: [id], onDelete: Cascade)
 
   @@id([userId, vaccinationId])
   @@map("users_on_vaccinations")

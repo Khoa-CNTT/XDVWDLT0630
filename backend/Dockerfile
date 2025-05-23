@@ -1,28 +1,51 @@
-FROM node:alpine AS development
+# Base image
+FROM node:18-alpine AS builder
 
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
-RUN npm install
+# Install dependencies
+RUN npm ci
 
-COPY . . 
-
-RUN npm run build
-
-FROM node:alpine as production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install --only=prod
-
+# Copy source code
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
+# Generate Prisma client
+RUN npx prisma generate
 
+# Build application
+RUN npm run build
+
+# Production image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Create directory for public files
+RUN mkdir -p public/qrcodes
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy Prisma schema
+COPY prisma ./prisma/
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+
+# Expose port
+EXPOSE 3001
+
+# Start the application
 CMD ["node", "dist/main"]

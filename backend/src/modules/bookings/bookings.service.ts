@@ -51,6 +51,11 @@ export class BookingsService {
       where: {
         createdAt: { lt: twentyFourHoursAgo },
         status: 'PENDING',
+        Payment: {
+          some: {
+            paymentMethod: 'CREDIT_CARD',
+          },
+        },
       },
     });
 
@@ -97,7 +102,7 @@ export class BookingsService {
   }
 
   async bookVaccination(data: CreateVaccinationBookingDto, userId: string) {
-    const { vaccinationId, vaccinationQuantity, appointmentDate } = data;
+    const { vaccinationId, vaccinationQuantity = 1, appointmentDate } = data;
 
     const vaccination = await this.prismaService.vaccination.findFirst({
       where: { id: vaccinationId },
@@ -298,7 +303,7 @@ export class BookingsService {
   async createBookingByAdmin(data: CreateBookingByAdminDto) {
     const {
       vaccinationId,
-      vaccinationQuantity,
+      vaccinationQuantity = 1,
       appointmentDate,
       userId: userAdmin,
     } = data;

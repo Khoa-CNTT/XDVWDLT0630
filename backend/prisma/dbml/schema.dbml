@@ -56,7 +56,7 @@ Table blogs {
 Table vaccinations {
   id String [pk]
   userId String
-  vaccineName String [not null]
+  vaccineName String [unique, not null]
   image String
   location String
   description String
@@ -70,6 +70,7 @@ Table vaccinations {
   manufacturerId String
   supplierId String
   sideEffect String
+  categoryVaccinationId String
   manufacturer manufacturers
   supplier suppliers
   user users_on_vaccinations [not null]
@@ -77,6 +78,14 @@ Table vaccinations {
   Inventory inventory [not null]
   VaccinationRecord vaccination_records [not null]
   Appointment appointments [not null]
+  CategoryVaccination category_vaccinations
+}
+
+Table category_vaccinations {
+  id String [pk]
+  name String [unique, not null]
+  description String
+  vaccines vaccinations [not null]
 }
 
 Table manufacturers {
@@ -173,6 +182,13 @@ Table payments {
   user users [not null]
 }
 
+Table blacklisted_tokens {
+  id String [pk]
+  token String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  expiresAt DateTime [not null]
+}
+
 Table users_on_vaccinations {
   userId String [not null]
   user users [not null]
@@ -238,26 +254,28 @@ Ref: vaccinations.manufacturerId > manufacturers.id
 
 Ref: vaccinations.supplierId > suppliers.id
 
-Ref: vaccination_records.userId > users.id
+Ref: vaccinations.categoryVaccinationId > category_vaccinations.id
+
+Ref: vaccination_records.userId > users.id [delete: Cascade]
 
 Ref: vaccination_records.vaccinationId > vaccinations.id
 
-Ref: appointments.userId > users.id
+Ref: appointments.userId > users.id [delete: Cascade]
 
 Ref: appointments.vaccinationId > vaccinations.id
 
-Ref: notifications.userId > users.id
+Ref: notifications.userId > users.id [delete: Cascade]
 
 Ref: inventory.vaccinationId > vaccinations.id
 
 Ref: bookings.vaccinationId > vaccinations.id
 
-Ref: bookings.userId > users.id
+Ref: bookings.userId > users.id [delete: Cascade]
 
 Ref: payments.bookingId > bookings.id [delete: Set Null]
 
-Ref: payments.userId > users.id
+Ref: payments.userId > users.id [delete: Cascade]
 
 Ref: users_on_vaccinations.userId > users.id
 
-Ref: users_on_vaccinations.vaccinationId > vaccinations.id
+Ref: users_on_vaccinations.vaccinationId > vaccinations.id [delete: Cascade]

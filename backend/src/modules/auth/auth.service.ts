@@ -122,6 +122,7 @@ export class AuthService {
         password: hashedPassword,
         confirmPassword: hashedPassword,
         name: userData.name,
+        phone: userData.phone,
         verificationCode: verificationData.code,
         verificationCodeExpiresAt: verificationData.expiresAt,
         isVerified: false,
@@ -204,21 +205,21 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException(
-        { message: 'Account not found' },
+        { message: 'Email hoặc mật khẩu không chính xác' },
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user.isVerified) {
       throw new HttpException(
-        { message: 'Account is not verified' },
+        { message: 'Tài khoản chưa được xác thực' },
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user.role) {
       throw new HttpException(
-        { message: 'User role not assigned' },
+        { message: 'Vai trò người dùng không được gán' },
         HttpStatus.FORBIDDEN,
       );
     }
@@ -226,7 +227,7 @@ export class AuthService {
     const isPasswordValid = await compare(credentials.password, user.password);
     if (!isPasswordValid) {
       throw new HttpException(
-        { message: 'Password is not correct' },
+        { message: 'Email hoặc mật khẩu không đúng.' },
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -262,13 +263,14 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role.name,
+      isVerified: user.role.isVerified,
     };
   }
 
   createToken = async (id: string): Promise<string> => {
     if (!process.env.ACCESS_TOKEN_KEY) {
       throw new Error(
-        'Access token secret key not found in environment variables.',
+        'Khóa bí mật token truy cập không được tìm thấy trong biến môi trường.',
       );
     }
 
@@ -287,7 +289,7 @@ export class AuthService {
     await this.sendResetPasswordEmail(data.email, access_token);
 
     return {
-      message: 'Password reset instructions have been sent to your email.',
+      message: 'Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.',
     };
   }
 
@@ -298,7 +300,7 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException(
-        { message: `Email ${email} not found` },
+        { message: `Email ${email} không tồn tại` },
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -323,7 +325,7 @@ export class AuthService {
     await this.validateNewPassword(newPassword, userRecord.password);
     await this.updateUserPassword(user.id, newPassword);
 
-    return { message: 'Password reset successfully' };
+    return { message: 'Đặt lại mật khẩu thành công' };
   }
 
   private async getUserPassword(userId: string) {
@@ -334,7 +336,7 @@ export class AuthService {
 
     if (!user?.password) {
       throw new HttpException(
-        { message: 'User password is missing' },
+        { message: 'Mật khẩu người dùng bị thiếu' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -349,7 +351,7 @@ export class AuthService {
     const isSamePassword = await compare(newPassword, currentPassword);
     if (isSamePassword) {
       throw new HttpException(
-        { message: 'New password cannot be the same as the old password' },
+        { message: 'Mật khẩu mới không thể giống với mật khẩu cũ' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -381,7 +383,7 @@ export class AuthService {
     );
     await this.updateUserPassword(user.id, newPassword);
 
-    return { message: 'Password changed successfully' };
+    return { message: 'Mật khẩu đã được thay đổi thành công' };
   }
 
   private async validateCurrentPassword(
@@ -394,7 +396,7 @@ export class AuthService {
     );
     if (!isCurrentPasswordCorrect) {
       throw new HttpException(
-        { message: 'Current password is incorrect' },
+        { message: 'Mật khẩu hiện tại không đúng' },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -407,44 +409,16 @@ export class AuthService {
   ): Promise<void> {
     if (isEqual(currentPassword, newPassword)) {
       throw new HttpException(
-        { message: 'New password cannot be the same as the current password' },
+        { message: 'Mật khẩu mới không thể giống với mật khẩu hiện tại' },
         HttpStatus.BAD_REQUEST,
       );
     }
 
     if (!isEqual(newPassword, confirmPassword)) {
       throw new HttpException(
-        { message: 'New password and confirm password do not match' },
+        { message: 'Mật khẩu mới và mật khẩu xác nhận không khớp' },
         HttpStatus.BAD_REQUEST,
       );
-    }
-  }
-
-  async refreshToken(
-    refreshTokenDto: RefreshTokenDto,
-  ): Promise<{ access_token: string }> {
-    const userId = await this.validateRefreshToken(
-      refreshTokenDto.refresh_token,
-    );
-    if (!userId) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    const user = await this.userService.getDetail(userId);
-    const access_token = this.jwtService.sign({
-      id: user.id,
-      email: user.email,
-    });
-
-    return { access_token };
-  }
-
-  private async validateRefreshToken(token: string): Promise<string | null> {
-    try {
-      const decoded = this.jwtService.verify(token);
-      return decoded.userId;
-    } catch (error) {
-      return null;
     }
   }
 
@@ -516,5 +490,121 @@ export class AuthService {
     }
 
     return employeeRole;
+  }
+
+  // logout
+  async logout(refreshToken: string): Promise<{ message: string }> {
+    if (!refreshToken) {
+      throw new HttpException(
+        { message: 'Refresh token là bắt buộc' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const payload = await this.validateRefreshToken(refreshToken);
+    if (!payload) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    await this.blacklistToken(refreshToken);
+
+    return { message: 'Đăng xuất thành công' };
+  }
+
+  private async blacklistToken(refreshToken: string): Promise<void> {
+    try {
+      const decoded = this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+
+      const expiresAt = new Date(decoded.exp * 1000);
+
+      await this.prismaService.blacklistedToken.create({
+        data: {
+          token: refreshToken,
+          expiresAt,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        { message: 'Không thể xóa token' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async validateRefreshToken(token: string): Promise<any> {
+    try {
+      const blacklisted = await this.prismaService.blacklistedToken.findUnique({
+        where: { token },
+      });
+
+      if (blacklisted) {
+        throw new UnauthorizedException('Token đã bị hủy bỏ');
+      }
+
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+      return decoded;
+    } catch (error) {
+      throw new UnauthorizedException('Token không hợp lệ');
+    }
+  }
+
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ access_token: string }> {
+    const payload = await this.validateRefreshToken(
+      refreshTokenDto.refresh_token,
+    );
+    if (!payload) {
+      throw new UnauthorizedException('Token không hợp lệ');
+    }
+
+    const user = await this.userService.getDetail(payload.id);
+    if (!user) {
+      throw new UnauthorizedException('Người dùng không tồn tại');
+    }
+
+    const access_token = this.jwtService.sign(
+      {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role?.name,
+      },
+      {
+        secret: process.env.ACCESS_TOKEN_KEY,
+        expiresIn: '1d',
+      },
+    );
+
+    return { access_token };
+  }
+
+  async resendVerificationEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new HttpException(
+        { message: `Email ${email} không tồn tại` },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    if (user.isVerified) {
+      throw new HttpException(
+        { message: 'Email đã được xác thực' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const verificationData = this.generateVerificationCode();
+    await this.sendVerificationEmail({
+      email: user.email,
+      verificationCode: verificationData.code,
+    });
+
+    return { message: 'Email xác thực đã được gửi lại' };
   }
 }
